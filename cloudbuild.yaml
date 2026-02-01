@@ -1,0 +1,39 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/gestionpagos-cloud/gestion-pagos-rest-api:latest', '-f', 'Dockerfile', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/gestionpagos-cloud/gestion-pagos-rest-api:latest']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - gestion-pagos-rest-api
+      - --image
+      - gcr.io/gestionpagos-cloud/gestion-pagos-rest-api:latest
+      - --region
+      - us-central1
+      - --platform
+      - managed
+      - --vpc-connector
+      - gp-connector
+      - --vpc-egress
+      - private-ranges-only
+      - --set-env-vars
+      - DB_HOST=10.70.0.5,DB_NAME=GestionPagos,DB_USER=gp_app
+      - --update-secrets
+      - DB_PASSWORD=DB_PASSWORD:latest
+      - --allow-unauthenticated
+      - --max-instances
+      - '10'
+      - --memory
+      - 512Mi
+      - --cpu
+      - '1'
+      - --port
+      - '8080'
+
+images:
+  - 'gcr.io/gestionpagos-cloud/gestion-pagos-rest-api:latest'
