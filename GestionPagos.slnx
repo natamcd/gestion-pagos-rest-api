@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="GestionPagos.Api/GestionPagos.Api.csproj" />
+  <Project Path="GestionPagos.Core/GestionPagos.Core.csproj" />
+  <Project Path="GestionPagos.Infrastructure/GestionPagos.Infrastructure.csproj" />
+</Solution>
