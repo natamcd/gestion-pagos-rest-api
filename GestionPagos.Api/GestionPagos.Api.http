@@ -1,0 +1,6 @@
+@GestionPagos.Api_HostAddress = http://localhost:5216
+
+GET {{GestionPagos.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
