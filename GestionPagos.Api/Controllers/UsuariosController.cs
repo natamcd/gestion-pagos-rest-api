@@ -41,6 +41,12 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
     {
+        // Hashear la contraseña si viene en texto plano
+        if (!usuario.PasswordHash.StartsWith("$2"))
+        {
+            usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
+        }
+        
         usuario.FechaCreacion = DateTime.UtcNow;
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();

@@ -1,5 +1,9 @@
 using GestionPagos.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using GestionPagos.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +32,32 @@ else
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Agregar servicio JWT
+builder.Services.AddScoped<JwtService>();
+
+// Configurar autenticación JWT
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "SuperSecretKeyForDevelopment12345678901234567890";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "GestionPagosApi";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "GestionPagosClient";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // Controllers, Swagger, CORS
 builder.Services.AddControllers();
@@ -60,6 +90,8 @@ if (isCloudRun)
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowAll");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 // Health check
