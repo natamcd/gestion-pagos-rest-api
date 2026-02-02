@@ -36,12 +36,12 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "La contraseña debe tener al menos 6 caracteres" });
         }
 
-        // Crear usuario con contraseña hasheada
+        // Crear usuario con contraseña hasheada (cost factor 11)
         var usuario = new Usuario
         {
             Nombre = dto.Nombre,
             Email = dto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password, 11),
             FechaCreacion = DateTime.UtcNow
         };
 

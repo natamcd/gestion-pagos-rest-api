@@ -41,8 +41,11 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
     {
-        // Hashear la contraseña si viene en texto plano
-        if (!usuario.PasswordHash.StartsWith("$2"))
+        // Hashear la contraseña si viene en texto plano (verificar formato BCrypt completo)
+        if (!usuario.PasswordHash.StartsWith("$2a$") && 
+            !usuario.PasswordHash.StartsWith("$2b$") && 
+            !usuario.PasswordHash.StartsWith("$2x$") && 
+            !usuario.PasswordHash.StartsWith("$2y$"))
         {
             usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
         }
